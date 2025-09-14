@@ -1,50 +1,62 @@
-package br.com.diario.controller;
+package com.diario.diario.controller;
 
-import br.com.diario.dto.LoginDTO;
-import br.com.diario.dto.LoginResponseDTO;
-import br.com.diario.dto.RegisterDTO;
-import br.com.diario.model.User;
-import br.com.diario.repository.UserRepository;
-import br.com.diario.security.TokenService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.diario.diario.dto.AuthResponse;
+import com.diario.diario.dto.LoginRequest;
+import com.diario.diario.dto.RegisterRequest;
+import com.diario.diario.model.User;
+import com.diario.diario.repository.UserRepository;
+import com.diario.diario.security.JwtUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private UserRepository repository;
-
-    @Autowired
-    private TokenService tokenService;
-
-    @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginDTO data) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.getEmail(), data.getSenha());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
-        var token = tokenService.generateToken((User) auth.getPrincipal());
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody RegisterDTO data) {
-        if (this.repository.findByEmail(data.getEmail()) != null) {
-            return ResponseEntity.badRequest().body("Este e-mail já está em uso.");
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
+            return new ResponseEntity<>("Email is already taken!", HttpStatus.BAD_REQUEST);
         }
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.getSenha());
-        User newUser = new User(data.getNomeCompleto(), data.getEmail(), encryptedPassword);
-        this.repository.save(newUser);
-        return ResponseEntity.ok().build();
+
+        
+        User user = new User();
+        user.setFullName(registerRequest.getFullName());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+
+        userRepository.save(user);
+
+        return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
+
+        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        final String token = jwtUtil.generateToken(userDetails);
+
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 }

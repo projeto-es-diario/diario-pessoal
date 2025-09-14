@@ -1,10 +1,19 @@
-package br.com.diario.repository;
+package com.diario.diario.repository;
 
-import br.com.diario.model.DiaryEntry;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.diario.diario.model.DiaryEntry;
+
+@Repository
 public interface DiaryEntryRepository extends JpaRepository<DiaryEntry, Long> {
 
-    List<DiaryEntry> findByUsuarioIdOrderByDataHoraDesc(Long userId);
+    List<DiaryEntry> findByUserIdOrderByCreatedAtDesc(Long userId);
+
+    List<DiaryEntry> findByUserIdAndContentContainingIgnoreCaseOrderByCreatedAtDesc(Long userId, String keyword);
+
+    List<DiaryEntry> findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(Long userId, LocalDateTime start, LocalDateTime end);
 }
