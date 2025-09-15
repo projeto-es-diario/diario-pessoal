@@ -1,0 +1,65 @@
+<div class="diary-container">
+  <header class="d-flex justify-content-between align-items-center mb-4">
+    <h2>My Diary</h2>
+    <button (click)="logout()" class="btn btn-danger">Logout</button>
+  </header>
+
+  <section class="mood-chart card mb-4">
+    <div class="card-body">
+      <app-mood-chart [entries]="entries"></app-mood-chart>
+    </div>
+  </section>
+
+  <section class="new-entry-form card mb-4">
+    <div class="card-body">
+      <h3 class="card-title">New Entry</h3>
+      <form [formGroup]="entryForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="content">How was your day?</label>
+          <textarea id="content" formControlName="content" rows="5" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="mood">How are you feeling? (1=Sad, 5=Happy)</label>
+          <select id="mood" formControlName="mood" class="form-control">
+            <option [ngValue]="null">-- Select Mood --</option>
+            <option *ngFor="let mood of moods" [value]="mood">{{ mood }}</option>
+          </select>
+        </div>
+        <button type="submit" [disabled]="entryForm.invalid" class="btn btn-primary mt-2">Save Entry</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="search-form card mb-4">
+    <div class="card-body">
+      <h3 class="card-title">Search Entries</h3>
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+        <div class="row">
+          <div class="col">
+            <input type="text" formControlName="keyword" placeholder="Search by keyword..." class="form-control">
+          </div>
+          <div class="col">
+            <input type="date" formControlName="date" class="form-control">
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-info">Search</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="entries-list">
+    <h3>Past Entries</h3>
+    <div *ngIf="entries.length === 0" class="alert alert-info">
+      No entries found. Try a different search or create a new entry!
+    </div>
+    <div *ngFor="let entry of entries" class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">{{ entry.createdAt | date: 'fullDate' }} at {{ entry.createdAt | date: 'shortTime' }}</h5>
+        <p class="card-text">{{ entry.content }}</p>
+        <p *ngIf="entry.mood" class="card-text"><small class="text-muted">Mood: {{ entry.mood }} / 5</small></p>
+      </div>
+    </div>
+  </section>
+</div>
