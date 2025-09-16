@@ -1,0 +1,14 @@
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: #ffffff !important;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  color: #007bff !important;
+}
+
+main.container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
