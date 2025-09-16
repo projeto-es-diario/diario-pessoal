@@ -1,10 +1,19 @@
-package com.diario.diario.dto;
+package com.example.demo.dto;
 
-public class LoginRequest {
+public class RegisterRequest {
+    private String fullName;
     private String email;
     private String password;
 
     // Getters and Setters
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     public String getEmail() {
         return email;
     }

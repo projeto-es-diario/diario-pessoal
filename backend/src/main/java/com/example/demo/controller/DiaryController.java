@@ -1,9 +1,9 @@
-package com.diario.diario.controller;
+package com.example.demo.controller;
 
-import com.diario.diario.dto.DiaryEntryRequest;
-import com.diario.diario.dto.DiaryEntryResponse;
-import com.diario.diario.model.DiaryEntry;
-import com.diario.diario.service.DiaryService;
+import com.example.demo.dto.DiaryEntryRequest;
+import com.example.demo.dto.DiaryEntryResponse;
+import com.example.demo.model.DiaryEntry;
+import com.example.demo.service.DiaryService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

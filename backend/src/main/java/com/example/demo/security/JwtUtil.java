@@ -1,4 +1,4 @@
-package com.diario.diario.security;
+package com.example.demo.security;
 
 import java.util.Date;
 import java.util.function.Function;

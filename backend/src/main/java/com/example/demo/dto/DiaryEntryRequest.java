@@ -1,4 +1,4 @@
-package com.diario.diario.dto;
+package com.example.demo.dto;
 
 public class DiaryEntryRequest {
     private String content;

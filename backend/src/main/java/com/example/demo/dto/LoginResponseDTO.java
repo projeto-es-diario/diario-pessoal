@@ -1,4 +1,4 @@
-package br.com.diario.dto;
+package com.example.demo.dto;
 
 public class LoginResponseDTO {
     private String token;

@@ -1,4 +1,4 @@
-package com.diario.diario.service;
+package com.example.demo.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -7,11 +7,11 @@ import java.util.List;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.diario.diario.dto.DiaryEntryRequest;
-import com.diario.diario.model.DiaryEntry;
-import com.diario.diario.model.User;
-import com.diario.diario.repository.DiaryEntryRepository;
-import com.diario.diario.repository.UserRepository;
+import com.example.demo.dto.DiaryEntryRequest;
+import com.example.demo.model.DiaryEntry;
+import com.example.demo.model.User;
+import com.example.demo.repository.DiaryEntryRepository;
+import com.example.demo.repository.UserRepository;
 
 @Service
 public class DiaryService {
