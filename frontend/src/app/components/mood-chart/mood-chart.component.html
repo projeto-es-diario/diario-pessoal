@@ -1,5 +1,5 @@
 <div class="chart-container">
-  <h3 class="mb-3">Mood History</h3>
+  <h3 class="mb-3">Histórico de Humor</h3>
   <div *ngIf="lineChartData[0].data.length > 0; else noData">
     <canvas baseChart
       [datasets]="lineChartData"
@@ -10,7 +10,7 @@
   </div>
   <ng-template #noData>
     <div class="alert alert-info">
-      No mood data available to display a chart. Add some entries with a mood rating!
+      Não há dados de humor para exibir um gráfico. Adicione algumas entradas com uma avaliação de humor!
     </div>
   </ng-template>
 </div>

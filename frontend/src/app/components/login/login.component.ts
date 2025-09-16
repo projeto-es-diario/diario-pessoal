@@ -30,12 +30,19 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
         next: (response) => {
-          this.authService.saveToken(response.token);
-          this.router.navigate(['/diary']); // Navigate to the main diary page
+          console.log('Login response received:', response);
+          if (response && response.data && response.data.token) {
+            console.log('Token found, saving:', response.data.token); 
+            this.authService.saveToken(response.data.token);
+            this.router.navigate(['/diary']);
+          } else {
+            this.errorMessage = 'Falha ao processar a resposta de login. Token não encontrado.';
+            console.error('Login response is missing data or token field:', response);
+          }
         },
         error: (err) => {
-          this.errorMessage = 'Invalid email or password.';
-          console.error(err);
+          this.errorMessage = 'Email ou senha inválidos.';
+          console.error('Login error:', err);
         }
       });
     }

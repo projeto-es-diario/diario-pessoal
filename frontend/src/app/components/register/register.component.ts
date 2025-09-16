@@ -44,11 +44,11 @@ export class RegisterComponent {
     if (this.registerForm.valid) {
       this.authService.register(this.registerForm.value).subscribe({
         next: () => {
-          alert('Registration successful! Please login.');
+          alert('Cadastro realizado com sucesso! Por favor, faça o login.');
           this.router.navigate(['/login']);
         },
         error: (err) => {
-          this.errorMessage = err.error.message || 'Registration failed. Please try again.';
+          this.errorMessage = err.error.message || 'O registro falhou. Por favor, tente novamente.';
           console.error(err);
         }
       });

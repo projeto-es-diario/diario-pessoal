@@ -14,7 +14,7 @@ export class MoodChartComponent implements OnChanges {
   @Input() entries: any[] = [];
 
   public lineChartData: ChartDataset[] = [
-    { data: [], label: 'Mood Trend' },
+    { data: [], label: 'Tendência de Humor' },
   ];
   public lineChartLabels: string[] = [];
   public lineChartOptions: ChartOptions = {

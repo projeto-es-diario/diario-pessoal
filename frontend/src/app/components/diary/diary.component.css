@@ -1,62 +1,83 @@
 .diary-container {
-  max-width: 800px;
-  margin: 2rem auto;
   padding: 2rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  background-color: #ffffff; 
 }
 
-h2, h3 {
-  color: #333;
-}
-
-.entry-form {
+.diary-header {
+  text-align: center;
   margin-bottom: 2rem;
-  padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
 }
 
-.entry-list {
-  margin-top: 2rem;
-}
-
-.diary-entry {
-  padding: 1.5rem;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  background: #f9f9f9;
-  transition: box-shadow 0.3s ease-in-out;
-}
-
-.diary-entry:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.diary-entry h4 {
-  margin-top: 0;
-  color: #0056b3;
-}
-
-.diary-entry p {
-  white-space: pre-wrap;
-  color: #555;
-}
-
-.diary-entry .date {
-  font-size: 0.9em;
-  color: #888;
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-.mood {
+.diary-header h2 {
+  color: #000000;
   font-weight: bold;
-  color: #28a745;
 }
 
-.btn-danger {
-    float: right;
+
+.forms-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 0 2rem;
+}
+
+
+.card {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.card-title {
+  color: #dc3545; 
+  font-weight: bold;
+  border-bottom: 2px solid #f2f2f2;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+
+.form-control:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+
+.entries-list {
+  padding: 0 2rem;
+}
+
+.entries-list h3 {
+  color: #000000;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.entry-card {
+  border-left: 5px solid #dc3545; 
+}
+
+.entry-card .card-title {
+  font-size: 1.1rem;
+  color: #000000;
+  border: none;
+}
+
+.entry-card .card-text {
+  color: #333333; 
+}
+
+
+.btn-primary, .btn-info {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: #ffffff;
+}
+
+.btn-primary:hover, .btn-info:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
 }
