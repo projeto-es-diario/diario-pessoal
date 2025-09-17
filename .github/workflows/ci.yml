@@ -122,7 +122,7 @@ jobs:
         
       - name: Run tests
         working-directory: ./frontend
-        run: npm test -- --coverage --watchAll=false
+        run: npm test -- --code-coverage --watch=false
         
       - name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v4
