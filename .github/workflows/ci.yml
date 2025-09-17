@@ -20,7 +20,7 @@ jobs:
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       frontend: ${{ steps.changes.outputs.frontend }}
-      ci: ${{ steps.changes.outputs.ci }} 
+      ci: ${{ steps.changes.outputs.ci }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,11 +34,11 @@ jobs:
               - 'backend/**'
             frontend:
               - 'frontend/**'
-            ci: # <-- ADICIONA O FILTRO PARA A PASTA DO WORKFLOW
+            ci:
               - '.github/workflows/**'
 
   backend-test-and-build:
-    needs: changes    
+    needs: changes
     if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
 
@@ -109,7 +109,7 @@ jobs:
           path: backend/target/*.jar
 
   frontend-test-and-build:
-    needs: changes    
+    needs: changes
     if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
     
@@ -175,4 +175,4 @@ jobs:
       - name: Deploy to staging
         run: |
           echo "Deploying to staging environment..."
-      
+          
