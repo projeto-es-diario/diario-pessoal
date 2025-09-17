@@ -24,3 +24,5 @@ export class AppComponent {
     this.router.navigate(['/login']);
   }
 }
+
+// Teste final do workflow
