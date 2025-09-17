@@ -1,31 +1,36 @@
 package com.example.demo.security;
 
+import java.util.Date;
+import java.util.function.Function;
+
+import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
-
-import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.function.Function;
 
 @Component
 public class TokenService {
 
-    @Value("${api.security.token.secret}")
+    @Value("${api.security.token.secret:myDefaultSecretKeyThatShouldBeAtLeast32CharactersLongForHS256Algorithm}")
     private String secretKeyString;
+
+    @Value("${api.security.token.expiration:36000000}") 
+    private Long expiration;
 
     private SecretKey key;
 
     @PostConstruct
     public void init() {
-        // A chave precisa ter um tamanho mínimo para o algoritmo HS256
+        
         if (secretKeyString.length() < 32) {
-            throw new IllegalArgumentException("JWT secret key must be at least 32 characters long.");
+            secretKeyString = "myDefaultSecretKeyThatShouldBeAtLeast32CharactersLongForHS256Algorithm";
         }
         this.key = Keys.hmacShaKeyFor(secretKeyString.getBytes());
     }
@@ -44,26 +49,41 @@ public class TokenService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            throw new RuntimeException("Token inválido ou expirado", e);
+        }
     }
 
     private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        try {
+            return extractExpiration(token).before(new Date());
+        } catch (Exception e) {
+            return true; 
+        }
     }
 
     public String generateToken(UserDetails userDetails) {
         return createToken(userDetails.getUsername());
     }
 
+    public String generateToken(String username) {
+        return createToken(username);
+    }
+
     private String createToken(String subject) {
+        Date now = new Date();
+        Date expirationDate = new Date(now.getTime() + expiration);
+
         return Jwts.builder()
                 .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 horas
+                .setIssuedAt(now)
+                .setExpiration(expirationDate)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -72,6 +92,23 @@ public class TokenService {
         try {
             final String username = extractUsername(token);
             return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Boolean validateToken(String token, String username) {
+        try {
+            final String extractedUsername = extractUsername(token);
+            return (extractedUsername.equals(username) && !isTokenExpired(token));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Boolean isTokenValid(String token) {
+        try {
+            return !isTokenExpired(token);
         } catch (Exception e) {
             return false;
         }
