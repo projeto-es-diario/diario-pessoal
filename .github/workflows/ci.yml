@@ -6,11 +6,13 @@ on:
     paths:
       - 'backend/**'
       - 'frontend/**'
+      - '.github/workflows/**'
   pull_request:
     branches: [ main ]
     paths:
       - 'backend/**'
       - 'frontend/**'
+      - '.github/workflows/**'
 
 jobs:
   changes:
@@ -162,4 +164,3 @@ jobs:
       - name: Deploy to staging
         run: |
           echo "Deploying to staging environment..."
-          
