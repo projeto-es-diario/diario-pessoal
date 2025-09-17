@@ -76,6 +76,14 @@ jobs:
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: postgres
 
+      - name: SonarCloud Scan for Backend
+        uses: SonarSource/sonarqube-scan-action@v3
+        with:
+          projectBaseDir: backend/
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
