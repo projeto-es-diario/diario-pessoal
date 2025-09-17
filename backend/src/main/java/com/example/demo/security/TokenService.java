@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -15,9 +16,19 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    // Use uma chave mais segura em produção
-    private final String SECRET_KEY = "mysecretkey_mysecretkey_mysecretkey_mysecretkey_mysecretkey";
-    private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    @Value("${api.security.token.secret}")
+    private String secretKeyString;
+
+    private SecretKey key;
+
+    @PostConstruct
+    public void init() {
+        // A chave precisa ter um tamanho mínimo para o algoritmo HS256
+        if (secretKeyString.length() < 32) {
+            throw new IllegalArgumentException("JWT secret key must be at least 32 characters long.");
+        }
+        this.key = Keys.hmacShaKeyFor(secretKeyString.getBytes());
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

@@ -6,7 +6,7 @@
 
   <section class="mood-chart card mb-4">
     <div class="card-body">
-      <app-mood-chart [entries]="entries"></app-mood-chart>
+      <app-mood-chart [entries]="publishedEntries"></app-mood-chart>
     </div>
   </section>
 
@@ -14,7 +14,7 @@
     <section class="new-entry-form card">
       <div class="card-body">
         <h3 class="card-title">Nova Entrada</h3>
-        <form [formGroup]="entryForm" (ngSubmit)="onSubmit()">
+        <form [formGroup]="entryForm">
           <div class="form-group">
             <label for="content">Como foi o seu dia?</label>
             <textarea id="content" formControlName="content" rows="5" class="form-control"></textarea>
@@ -26,7 +26,10 @@
               <option *ngFor="let mood of moods" [value]="mood">{{ mood }}</option>
             </select>
           </div>
-          <button type="submit" [disabled]="entryForm.invalid" class="btn btn-primary mt-2">Salvar Entrada</button>
+          <div class="button-group mt-2">
+            <button type="button" (click)="onSubmit('PUBLISHED')" [disabled]="entryForm.invalid" class="btn btn-primary">Salvar Entrada</button>
+            <button type="button" (click)="onSubmit('DRAFT')" class="btn btn-secondary">Salvar Rascunho</button>
+          </div>
         </form>
       </div>
     </section>
@@ -47,12 +50,22 @@
     </section>
   </div>
 
+  <section class="drafts-list" *ngIf="drafts.length > 0">
+      <h3>Rascunhos</h3>
+      <div *ngFor="let draft of drafts" class="card mb-3 draft-card" (click)="loadDraftForEditing(draft)">
+        <div class="card-body">
+          <h5 class="card-title">Rascunho de {{ draft.createdAt | date: 'short' }}</h5>
+          <p class="card-text">{{ draft.content | slice:0:100 }}...</p>
+        </div>
+      </div>
+  </section>
+
   <section class="entries-list">
     <h3>Entradas Anteriores</h3>
-    <div *ngIf="entries.length === 0" class="alert alert-info">
+    <div *ngIf="publishedEntries.length === 0" class="alert alert-info">
       Nenhuma entrada encontrada. Tente uma busca diferente ou crie uma nova entrada!
     </div>
-    <div *ngFor="let entry of entries" class="card mb-3 entry-card">
+    <div *ngFor="let entry of publishedEntries" class="card mb-3 entry-card">
       <div class="card-body">
         <h5 class="card-title">{{ entry.createdAt | date: 'fullDate' }} às {{ entry.createdAt | date: 'shortTime' }}</h5>
         <p class="card-text">{{ entry.content }}</p>

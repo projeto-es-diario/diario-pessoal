@@ -16,8 +16,13 @@ import { MoodChartComponent } from '../mood-chart/mood-chart.component';
 export class DiaryComponent implements OnInit {
   entryForm: FormGroup;
   searchForm: FormGroup;
-  entries: any[] = [];
-  moods = [1, 2, 3, 4, 5]; // 1: Sad, 5: Happy
+  
+  allEntries: any[] = [];
+  publishedEntries: any[] = [];
+  drafts: any[] = [];
+
+  moods = [1, 2, 3, 4, 5]; 
+  editingDraftId: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -43,7 +48,9 @@ export class DiaryComponent implements OnInit {
   loadEntries(): void {
     this.diaryService.getEntries().subscribe({
       next: (data) => {
-        this.entries = data;
+        this.allEntries = data;
+        this.publishedEntries = data.filter(e => e.status === 'PUBLISHED');
+        this.drafts = data.filter(e => e.status === 'DRAFT');
       },
       error: (err) => {
         console.error('Failed to load entries', err);
@@ -55,7 +62,9 @@ export class DiaryComponent implements OnInit {
     const { keyword, date } = this.searchForm.value;
     this.diaryService.searchEntries(keyword, date).subscribe({
       next: (data) => {
-        this.entries = data;
+        this.allEntries = data;
+        this.publishedEntries = data.filter(e => e.status === 'PUBLISHED');
+        this.drafts = data.filter(e => e.status === 'DRAFT');
       },
       error: (err) => {
         console.error('Failed to search entries', err);
@@ -63,18 +72,29 @@ export class DiaryComponent implements OnInit {
     });
   }
 
-  onSubmit(): void {
+  onSubmit(status: 'PUBLISHED' | 'DRAFT'): void {
     if (this.entryForm.valid) {
-      this.diaryService.createEntry(this.entryForm.value).subscribe({
+      const entryData = { ...this.entryForm.value, status };
+      
+      this.diaryService.createEntry(entryData).subscribe({
         next: () => {
-          this.loadEntries(); // Refresh the list
+          this.loadEntries(); 
           this.entryForm.reset();
+          this.editingDraftId = null;
         },
         error: (err) => {
           console.error('Failed to create entry', err);
         }
       });
     }
+  }
+
+  loadDraftForEditing(draft: any): void {
+    this.entryForm.patchValue({
+      content: draft.content,
+      mood: draft.mood
+    });
+    this.editingDraftId = draft.id;
   }
 
   logout(): void {

@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -7,9 +8,16 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
 
-  private apiUrl = 'http://localhost:8080/api/auth'; // Adjust if your backend runs on a different port
+  private apiUrl = 'http://localhost:8080/api/auth';
+  private isBrowser: boolean;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    // Verifica se o código está rodando no navegador
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   register(user: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, user);
@@ -20,14 +28,24 @@ export class AuthService {
   }
 
   saveToken(token: string): void {
-    localStorage.setItem('authToken', token);
+    // Só executa se estiver no navegador
+    if (this.isBrowser) {
+      localStorage.setItem('authToken', token);
+    }
   }
 
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    // Só executa se estiver no navegador
+    if (this.isBrowser) {
+      return localStorage.getItem('authToken');
+    }
+    return null;
   }
 
   logout(): void {
-    localStorage.removeItem('authToken');
+    // Só executa se estiver no navegador
+    if (this.isBrowser) {
+      localStorage.removeItem('authToken');
+    }
   }
 }

@@ -44,7 +44,8 @@ export class MoodChartComponent implements OnChanges {
       .filter(e => e.mood != null)
       .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
-    this.lineChartLabels = sortedEntries.map(e => new Date(e.createdAt).toLocaleDateString());
+    // Utiliza toLocaleDateString com a localidade 'pt-BR'
+    this.lineChartLabels = sortedEntries.map(e => new Date(e.createdAt).toLocaleDateString('pt-BR'));
     this.lineChartData[0].data = sortedEntries.map(e => e.mood);
   }
 }

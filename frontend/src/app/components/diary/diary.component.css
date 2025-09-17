@@ -45,11 +45,12 @@
 }
 
 
-.entries-list {
+.entries-list, .drafts-list {
   padding: 0 2rem;
+  margin-bottom: 2rem;
 }
 
-.entries-list h3 {
+.entries-list h3, .drafts-list h3 {
   color: #000000;
   font-weight: bold;
   text-align: center;
@@ -58,6 +59,16 @@
 
 .entry-card {
   border-left: 5px solid #dc3545; 
+}
+
+.draft-card {
+  border-left: 5px solid #6c757d; 
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.draft-card:hover {
+    background-color: #f8f9fa;
 }
 
 .entry-card .card-title {
@@ -80,4 +91,9 @@
 .btn-primary:hover, .btn-info:hover {
   background-color: #c82333;
   border-color: #bd2130;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
 }

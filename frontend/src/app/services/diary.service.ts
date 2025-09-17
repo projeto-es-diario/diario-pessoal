@@ -9,13 +9,15 @@ export class DiaryService {
 
   private apiUrl = 'http://localhost:8080/api/diary';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    
+   }
 
   getEntries(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/entries`);
   }
 
-  createEntry(entry: { content: string, mood?: number }): Observable<any> {
+  createEntry(entry: { content: string, mood?: number, status: string }): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/entries`, entry);
   }
 

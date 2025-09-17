@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 export class AppComponent {
   title = 'Diário Pessoal';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, public router: Router) {}
 
   isLoggedIn(): boolean {
     return this.authService.getToken() !== null;
