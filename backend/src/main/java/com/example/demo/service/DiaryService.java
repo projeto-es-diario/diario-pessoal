@@ -32,7 +32,8 @@ public class DiaryService {
         newEntry.setContent(request.getContent());
         newEntry.setMood(request.getMood());
         newEntry.setUser(user);
-        
+        newEntry.setStatus(request.getStatus());
+
         return diaryEntryRepository.save(newEntry);
     }
 
@@ -45,11 +46,11 @@ public class DiaryService {
     public List<DiaryEntry> searchEntries(String userEmail, String keyword, LocalDate date) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        
+
         if (keyword != null && !keyword.isEmpty()) {
             return diaryEntryRepository.findByUserIdAndContentContainingIgnoreCaseOrderByCreatedAtDesc(user.getId(), keyword);
         }
-        
+
         if (date != null) {
             LocalDateTime startOfDay = date.atStartOfDay();
             LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();

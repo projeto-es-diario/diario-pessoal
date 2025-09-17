@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+import com.example.demo.model.DiaryEntry;
 import java.time.LocalDateTime;
 
 public class DiaryEntryResponse {
@@ -7,12 +8,14 @@ public class DiaryEntryResponse {
     private String content;
     private Integer mood;
     private LocalDateTime createdAt;
+    private DiaryEntry.EntryStatus status;
 
-    public DiaryEntryResponse(Long id, String content, Integer mood, LocalDateTime createdAt) {
+    public DiaryEntryResponse(Long id, String content, Integer mood, LocalDateTime createdAt, DiaryEntry.EntryStatus status) {
         this.id = id;
         this.content = content;
         this.mood = mood;
         this.createdAt = createdAt;
+        this.status = status;
     }
 
     // Getters and Setters
@@ -46,5 +49,13 @@ public class DiaryEntryResponse {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public DiaryEntry.EntryStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(DiaryEntry.EntryStatus status) {
+        this.status = status;
     }
 }

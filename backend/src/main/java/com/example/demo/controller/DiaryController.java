@@ -28,7 +28,7 @@ public class DiaryController {
     public ResponseEntity<DiaryEntryResponse> createEntry(@RequestBody DiaryEntryRequest request, Authentication authentication) {
         String userEmail = authentication.getName();
         DiaryEntry newEntry = diaryService.createEntry(userEmail, request);
-        DiaryEntryResponse response = new DiaryEntryResponse(newEntry.getId(), newEntry.getContent(), newEntry.getMood(), newEntry.getCreatedAt());
+        DiaryEntryResponse response = new DiaryEntryResponse(newEntry.getId(), newEntry.getContent(), newEntry.getMood(), newEntry.getCreatedAt(), newEntry.getStatus());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -37,7 +37,7 @@ public class DiaryController {
         String userEmail = authentication.getName();
         List<DiaryEntry> entries = diaryService.getEntriesForUser(userEmail);
         List<DiaryEntryResponse> response = entries.stream()
-                .map(e -> new DiaryEntryResponse(e.getId(), e.getContent(), e.getMood(), e.getCreatedAt()))
+                .map(e -> new DiaryEntryResponse(e.getId(), e.getContent(), e.getMood(), e.getCreatedAt(), e.getStatus()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
@@ -47,11 +47,11 @@ public class DiaryController {
             Authentication authentication,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        
+
         String userEmail = authentication.getName();
         List<DiaryEntry> entries = diaryService.searchEntries(userEmail, keyword, date);
         List<DiaryEntryResponse> response = entries.stream()
-                .map(e -> new DiaryEntryResponse(e.getId(), e.getContent(), e.getMood(), e.getCreatedAt()))
+                .map(e -> new DiaryEntryResponse(e.getId(), e.getContent(), e.getMood(), e.getCreatedAt(), e.getStatus()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }

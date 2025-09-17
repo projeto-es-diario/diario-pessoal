@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Component
-public class JwtUtil {
+public class TokenService {
 
     @Value("${api.security.token.secret}")
     private String secretKeyString;

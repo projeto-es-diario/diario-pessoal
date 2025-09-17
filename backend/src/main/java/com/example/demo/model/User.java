@@ -1,15 +1,20 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Mapeia o campo fullName para a coluna 'name' no banco
     @Column(name = "name", nullable = false)
     private String fullName;
 
@@ -21,30 +26,50 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.USER; // Valor padrão
-
-    // Enum para roles
-    public enum Role {
-        USER, ADMIN, MODERATOR
-    }
+    private UserRole role = UserRole.USER;
 
     // Construtores
     public User() {
-        this.role = Role.USER; // Garantir valor padrão
+        this.role = UserRole.USER;
     }
 
-    public User(String fullName, String email, String password) {
-        this.fullName = fullName;
-        this.email = email;
-        this.password = password;
-        this.role = Role.USER; // Valor padrão
-    }
-
-    public User(String fullName, String email, String password, Role role) {
+    public User(String fullName, String email, String password, UserRole role) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    // Métodos da Interface UserDetails
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if(this.role == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+        else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     // Getters e Setters
@@ -80,20 +105,11 @@ public class User {
         this.password = password;
     }
 
-    public Role getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(UserRole role) {
         this.role = role;
-    }
-
-    // Métodos utilitários
-    public boolean isAdmin() {
-        return this.role == Role.ADMIN;
-    }
-
-    public boolean isModerator() {
-        return this.role == Role.MODERATOR || this.role == Role.ADMIN;
     }
 }
