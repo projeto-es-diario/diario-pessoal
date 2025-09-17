@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Check for changes
         uses: dorny/paths-filter@v2
         id: changes
@@ -112,37 +112,37 @@ jobs:
     needs: changes
     if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
-          
+
       - name: Install dependencies
         working-directory: ./frontend
         run: npm ci
-        
+
       - name: Run tests
         working-directory: ./frontend
         run: npm test -- --no-watch --code-coverage --browsers=ChromeHeadless
-        
+
       - name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           file: frontend/coverage/lcov.info
           flags: frontend
           name: frontend-coverage
-        
+
       - name: Build project
         working-directory: ./frontend
         run: npm run build
-        
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -153,25 +153,25 @@ jobs:
     needs: [backend-test-and-build, frontend-test-and-build]
     if: always() && (needs.backend-test-and-build.result == 'success' || needs.backend-test-and-build.result == 'skipped') && (needs.frontend-test-and-build.result == 'success' || needs.frontend-test-and-build.result == 'skipped') && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Download backend artifact
         if: needs.backend-test-and-build.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: backend-jar
           path: ./deploy/backend/
-          
+
       - name: Download frontend artifact  
         if: needs.frontend-test-and-build.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: ./deploy/frontend/
-          
+
       - name: Deploy to staging
         run: |
           echo "Deploying to staging environment..."
