@@ -6,13 +6,11 @@ on:
     paths:
       - 'backend/**'
       - 'frontend/**'
-      - '.github/workflows/**'
   pull_request:
     branches: [ main ]
     paths:
       - 'backend/**'
       - 'frontend/**'
-      - '.github/workflows/**'
 
 jobs:
   changes:
@@ -20,11 +18,10 @@ jobs:
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       frontend: ${{ steps.changes.outputs.frontend }}
-      ci: ${{ steps.changes.outputs.ci }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+      
       - name: Check for changes
         uses: dorny/paths-filter@v2
         id: changes
@@ -34,12 +31,10 @@ jobs:
               - 'backend/**'
             frontend:
               - 'frontend/**'
-            ci:
-              - '.github/workflows/**'
 
   backend-test-and-build:
     needs: changes
-    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
 
     services:
@@ -73,23 +68,15 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('backend/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Run tests with JaCoCo
+      - name: Run tests, JaCoCo report, and SonarCloud scan
         working-directory: ./backend
-        run: mvn clean test jacoco:report
+        run: mvn -B verify jacoco:report sonar:sonar
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: postgres
-
-      - name: SonarCloud Scan for Backend
-        uses: SonarSource/sonarqube-scan-action@v3
-        with:
-          projectBaseDir: backend/
-        env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_PROJECT_KEY: projeto-es-diario_diario-pessoal
-          SONAR_ORGANIZATION: projeto-es-diario
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -110,68 +97,69 @@ jobs:
 
   frontend-test-and-build:
     needs: changes
-    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
-
+          
       - name: Install dependencies
         working-directory: ./frontend
         run: npm ci
-
+        
       - name: Run tests
         working-directory: ./frontend
-        run: npm test -- --no-watch --code-coverage --browsers=ChromeHeadless
-
+        run: npm test -- --coverage --watchAll=false
+        
       - name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           file: frontend/coverage/lcov.info
           flags: frontend
           name: frontend-coverage
-
+        
       - name: Build project
         working-directory: ./frontend
         run: npm run build
-
+        
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
-          path: frontend/dist/frontend/browser/
+          path: frontend/build/
 
   deploy:
     needs: [backend-test-and-build, frontend-test-and-build]
     if: always() && (needs.backend-test-and-build.result == 'success' || needs.backend-test-and-build.result == 'skipped') && (needs.frontend-test-and-build.result == 'success' || needs.frontend-test-and-build.result == 'skipped') && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        
       - name: Download backend artifact
         if: needs.backend-test-and-build.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: backend-jar
           path: ./deploy/backend/
-
+          
       - name: Download frontend artifact  
         if: needs.frontend-test-and-build.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: ./deploy/frontend/
-
+          
       - name: Deploy to staging
         run: |
           echo "Deploying to staging environment..."
+          
