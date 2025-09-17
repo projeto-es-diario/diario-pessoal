@@ -20,6 +20,7 @@ jobs:
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       frontend: ${{ steps.changes.outputs.frontend }}
+      ci: ${{ steps.changes.outputs.ci }} 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,10 +34,12 @@ jobs:
               - 'backend/**'
             frontend:
               - 'frontend/**'
+            ci: # <-- ADICIONA O FILTRO PARA A PASTA DO WORKFLOW
+              - '.github/workflows/**'
 
   backend-test-and-build:
-    needs: changes
-    if: needs.changes.outputs.backend == 'true'
+    needs: changes    
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
 
     services:
@@ -106,8 +109,8 @@ jobs:
           path: backend/target/*.jar
 
   frontend-test-and-build:
-    needs: changes
-    if: needs.changes.outputs.frontend == 'true'
+    needs: changes    
+    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
     
     steps:
@@ -127,8 +130,8 @@ jobs:
         
       - name: Run tests
         working-directory: ./frontend
-        run: npm test -- --no-watch --code-coverage --browsers=ChromeHeadless 
-
+        run: npm test -- --no-watch --code-coverage --browsers=ChromeHeadless
+        
       - name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -172,4 +175,4 @@ jobs:
       - name: Deploy to staging
         run: |
           echo "Deploying to staging environment..."
-          
+      
