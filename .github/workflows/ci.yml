@@ -20,6 +20,7 @@ jobs:
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       frontend: ${{ steps.changes.outputs.frontend }}
+      ci: ${{ steps.changes.outputs.ci }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,10 +34,12 @@ jobs:
               - 'backend/**'
             frontend:
               - 'frontend/**'
+            ci:
+              - '.github/workflows/**'
 
   backend-test-and-build:
     needs: changes
-    if: needs.changes.outputs.backend == 'true'
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
 
     services:
@@ -99,7 +102,7 @@ jobs:
 
   frontend-test-and-build:
     needs: changes
-    if: needs.changes.outputs.frontend == 'true'
+    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
     
     steps:
